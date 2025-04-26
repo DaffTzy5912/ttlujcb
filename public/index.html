@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TikTok Downloader - Video & Audio</title>
+  <title>TikTok Downloader</title>
   <style>
-    /* Style sama seperti sebelumnya */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #00f2ea, #7b2ff7);
@@ -18,7 +21,11 @@
       padding: 20px;
       color: #fff;
     }
-    h1 { margin-bottom: 20px; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
     .container {
       background: rgba(255, 255, 255, 0.1);
       padding: 30px 20px;
@@ -71,27 +78,15 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
+    p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
     video {
       margin-top: 20px;
       width: 100%;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    a.download-link {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #fff;
-      color: #7b2ff7;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s, color 0.3s;
-      margin-right: 10px;
-    }
-    a.download-link:hover {
-      background: #7b2ff7;
-      color: #fff;
     }
   </style>
 </head>
@@ -127,7 +122,7 @@
     async function download() {
       const url = document.getElementById('urlInput').value;
       if (!url) return alert('Masukkan URL TikTok!');
-
+      
       const loading = document.getElementById('loading');
       const result = document.getElementById('result');
       loading.style.display = 'block';
@@ -144,20 +139,10 @@
 
         if (data.success) {
           result.innerHTML = `
-  <p>✅ Video berhasil didapatkan:</p>
-  <video controls src="${data.videoUrl}"></video>
-  <div style="margin-top: 15px;">
-    <audio controls style="width: 100%;">
-      <source src="${data.audioUrl}" type="audio/mpeg">
-      Browser Anda tidak mendukung pemutaran audio.
-    </audio>
-    <div style="margin-top: 10px;">
-      <a href="${data.videoUrl}" download class="download-link">Download Video</a>
-    </div>
-  </div>
-`;
-
-          // Otomatis download video (bisa dihapus kalau mau manual klik)
+            <p>✅ Video berhasil didapatkan:</p>
+            <video controls src="${data.videoUrl}"></video>
+          `;
+          
           const a = document.createElement('a');
           a.href = data.videoUrl;
           a.download = 'tiktok-video.mp4';
@@ -171,7 +156,7 @@
       } catch (error) {
         console.error(error);
         loading.style.display = 'none';
-        result.innerHTML = `<p style="color: #ff4c4c;">Terjadi kesalahan saat mengunduh.</p>`;
+        result.innerHTML = `<p style="color: #ff4c4c;">Terjadi kesalahan saat mengunduh video.</p>`;
       }
     }
   </script>
