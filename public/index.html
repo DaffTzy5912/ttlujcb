@@ -69,30 +69,24 @@
     #result {
       margin-top: 20px;
     }
+    #loading {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
     video {
       margin-top: 20px;
       width: 100%;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    a.download-link {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #fff;
-      color: #7b2ff7;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s, color 0.3s;
-    }
-    a.download-link:hover {
-      background: #7b2ff7;
-      color: #fff;
-    }
-    p {
-      margin-top: 10px;
-      font-size: 1.1rem;
     }
   </style>
 </head>
@@ -105,6 +99,7 @@
       <button onclick="deleteLink()">Hapus</button>
       <button onclick="download()">Download</button>
     </div>
+    <div id="loading" style="display: none;">⏳ Memproses video...</div>
     <div id="result"></div>
   </div>
 
@@ -121,29 +116,48 @@
     function deleteLink() {
       document.getElementById('urlInput').value = '';
       document.getElementById('result').innerHTML = '';
+      document.getElementById('loading').style.display = 'none';
     }
 
     async function download() {
       const url = document.getElementById('urlInput').value;
       if (!url) return alert('Masukkan URL TikTok!');
       
-      const res = await fetch('/api/tiktok', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
-
-      const data = await res.json();
+      const loading = document.getElementById('loading');
       const result = document.getElementById('result');
-      if (data.success) {
-        result.innerHTML = `
-          <p>✅ Video berhasil didapatkan:</p>
-          <video controls src="${data.videoUrl}"></video>
-          <br>
-          <a href="${data.videoUrl}" download class="download-link">Download Video</a>
-        `;
-      } else {
-        result.innerHTML = `<p style="color: #ff4c4c;">${data.message}</p>`;
+      loading.style.display = 'block';
+      result.innerHTML = '';
+
+      try {
+        const res = await fetch('/api/tiktok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+        loading.style.display = 'none';
+
+        if (data.success) {
+          result.innerHTML = `
+            <p>✅ Video berhasil didapatkan:</p>
+            <video controls src="${data.videoUrl}"></video>
+          `;
+          
+          // Otomatis download file video
+          const a = document.createElement('a');
+          a.href = data.videoUrl;
+          a.download = 'tiktok-video.mp4';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+        } else {
+          result.innerHTML = `<p style="color: #ff4c4c;">${data.message}</p>`;
+        }
+      } catch (error) {
+        console.error(error);
+        loading.style.display = 'none';
+        result.innerHTML = `<p style="color: #ff4c4c;">Terjadi kesalahan saat mengunduh video.</p>`;
       }
     }
   </script>
