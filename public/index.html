@@ -39,15 +39,20 @@
     input {
       width: 100%;
       padding: 12px 15px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       border: none;
       border-radius: 8px;
       font-size: 1rem;
       outline: none;
     }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
     button {
-      width: 100%;
-      padding: 12px;
+      flex: 1;
+      padding: 10px;
       border: none;
       border-radius: 8px;
       background: #fff;
@@ -70,6 +75,21 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
+    a.download-link {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #7b2ff7;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s, color 0.3s;
+    }
+    a.download-link:hover {
+      background: #7b2ff7;
+      color: #fff;
+    }
     p {
       margin-top: 10px;
       font-size: 1.1rem;
@@ -80,24 +100,47 @@
   <h1>TikTok Downloader</h1>
   <div class="container">
     <input type="text" id="urlInput" placeholder="Masukkan URL TikTok...">
-    <button onclick="download()">Download Video</button>
+    <div class="button-group">
+      <button onclick="pasteLink()">Paste</button>
+      <button onclick="deleteLink()">Hapus</button>
+      <button onclick="download()">Download</button>
+    </div>
     <div id="result"></div>
   </div>
 
   <script>
+    async function pasteLink() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('urlInput').value = text;
+      } catch (err) {
+        alert('Gagal mengakses clipboard!');
+      }
+    }
+
+    function deleteLink() {
+      document.getElementById('urlInput').value = '';
+      document.getElementById('result').innerHTML = '';
+    }
+
     async function download() {
       const url = document.getElementById('urlInput').value;
+      if (!url) return alert('Masukkan URL TikTok!');
+      
       const res = await fetch('/api/tiktok', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
+
       const data = await res.json();
       const result = document.getElementById('result');
       if (data.success) {
         result.innerHTML = `
           <p>✅ Video berhasil didapatkan:</p>
           <video controls src="${data.videoUrl}"></video>
+          <br>
+          <a href="${data.videoUrl}" download class="download-link">Download Video</a>
         `;
       } else {
         result.innerHTML = `<p style="color: #ff4c4c;">${data.message}</p>`;
