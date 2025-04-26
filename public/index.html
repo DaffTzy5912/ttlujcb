@@ -2,18 +2,87 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TikTok Downloader</title>
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 50px; }
-    input, button { padding: 10px; width: 80%; max-width: 500px; margin-top: 10px; }
-    video { margin-top: 20px; width: 100%; max-width: 500px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #00f2ea, #7b2ff7);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #fff;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #7b2ff7;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    button:hover {
+      background: #7b2ff7;
+      color: #fff;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    video {
+      margin-top: 20px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
-  <h1>Download Video TikTok</h1>
-  <input type="text" id="urlInput" placeholder="Masukkan URL TikTok">
-  <button onclick="download()">Download</button>
-  <div id="result"></div>
+  <h1>TikTok Downloader</h1>
+  <div class="container">
+    <input type="text" id="urlInput" placeholder="Masukkan URL TikTok...">
+    <button onclick="download()">Download Video</button>
+    <div id="result"></div>
+  </div>
 
   <script>
     async function download() {
@@ -31,7 +100,7 @@
           <video controls src="${data.videoUrl}"></video>
         `;
       } else {
-        result.innerHTML = `<p style="color:red;">${data.message}</p>`;
+        result.innerHTML = `<p style="color: #ff4c4c;">${data.message}</p>`;
       }
     }
   </script>
