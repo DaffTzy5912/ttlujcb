@@ -144,13 +144,18 @@
 
         if (data.success) {
           result.innerHTML = `
-            <p>✅ Video berhasil didapatkan:</p>
-            <video controls src="${data.videoUrl}"></video>
-            <div style="margin-top: 15px;">
-              <a href="${data.videoUrl}" download class="download-link">Download Video</a>
-              <a href="${data.audioUrl}" download class="download-link">Download MP3</a>
-            </div>
-          `;
+  <p>✅ Video berhasil didapatkan:</p>
+  <video controls src="${data.videoUrl}"></video>
+  <div style="margin-top: 15px;">
+    <audio controls style="width: 100%;">
+      <source src="${data.audioUrl}" type="audio/mpeg">
+      Browser Anda tidak mendukung pemutaran audio.
+    </audio>
+    <div style="margin-top: 10px;">
+      <a href="${data.videoUrl}" download class="download-link">Download Video</a>
+    </div>
+  </div>
+`;
 
           // Otomatis download video (bisa dihapus kalau mau manual klik)
           const a = document.createElement('a');
