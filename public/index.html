@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>TikTok Downloader</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    input, button { padding: 10px; width: 80%; max-width: 500px; margin-top: 10px; }
+    video { margin-top: 20px; width: 100%; max-width: 500px; }
+  </style>
+</head>
+<body>
+  <h1>Download Video TikTok</h1>
+  <input type="text" id="urlInput" placeholder="Masukkan URL TikTok">
+  <button onclick="download()">Download</button>
+  <div id="result"></div>
+
+  <script>
+    async function download() {
+      const url = document.getElementById('urlInput').value;
+      const res = await fetch('/api/tiktok', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      const result = document.getElementById('result');
+      if (data.success) {
+        result.innerHTML = `
+          <p>✅ Video berhasil didapatkan:</p>
+          <video controls src="${data.videoUrl}"></video>
+        `;
+      } else {
+        result.innerHTML = `<p style="color:red;">${data.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
