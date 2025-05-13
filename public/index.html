@@ -228,8 +228,14 @@
       background: rgba(0, 0, 0, 0.2);
     }
     
-    .download-now {
+    .download-options {
       margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .download-now {
       background: var(--success);
       color: var(--light);
       padding: 12px 20px;
@@ -237,10 +243,22 @@
       font-weight: 600;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       text-decoration: none;
       transition: all 0.3s ease;
       cursor: pointer;
+      width: 100%;
+    }
+    
+    .download-alt {
+      background: var(--warning);
+      color: var(--dark);
+    }
+    
+    .download-direct {
+      background: var(--primary);
+      color: var(--light);
     }
     
     .download-now:hover {
@@ -248,11 +266,23 @@
       box-shadow: 0 6px 15px rgba(0, 210, 106, 0.3);
     }
     
+    .download-alt:hover {
+      box-shadow: 0 6px 15px rgba(255, 187, 0, 0.3);
+    }
+    
+    .download-direct:hover {
+      box-shadow: 0 6px 15px rgba(123, 47, 247, 0.3);
+    }
+    
     .footer {
       margin-top: 30px;
       text-align: center;
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.5);
+    }
+    
+    #videoSrc {
+      display: none;
     }
     
     @media (max-width: 600px) {
@@ -275,7 +305,7 @@
     <div class="logo">
       <i class="fab fa-tiktok"></i>
     </div>
-    <h1>TikTok Downloader</h1>
+    <h1>TikTok Downloader V2</h1>
     <p class="subheading">Unduh video TikTok tanpa watermark dengan mudah</p>
   </div>
   
@@ -311,6 +341,9 @@
   <div class="footer">
     &copy; Unduh video TikTok dengan cepat dan aman
   </div>
+
+  <!-- Hidden video source element -->
+  <a id="videoSrc" href="#" download="tiktok-video.mp4"></a>
 
   <script>
     async function pasteLink() {
@@ -357,7 +390,6 @@
       result.innerHTML = '';
 
       try {
-        // Simulasi delay untuk demo UI
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         const res = await fetch('/api/tiktok', {
@@ -376,12 +408,20 @@
                 <i class="fas fa-check-circle success"></i>
                 <span>Video berhasil didapatkan</span>
               </div>
-              <video controls src="${data.videoUrl}"></video>
-              <div style="text-align: center; margin-top: 15px;">
-                <div class="download-now" onclick="saveVideo('${data.videoUrl}')">
+              <video id="videoPreview" controls src="${data.videoUrl}"></video>
+              <div class="download-options">
+                <div class="download-now" onclick="saveVideo('${data.videoUrl}', 'metode1')">
                   <i class="fas fa-cloud-download-alt"></i>
-                  <span>Simpan Video</span>
+                  <span>Simpan Video (Metode 1)</span>
                 </div>
+                <div class="download-now download-alt" onclick="saveVideo('${data.videoUrl}', 'metode2')">
+                  <i class="fas fa-download"></i>
+                  <span>Simpan Video (Metode 2)</span>
+                </div>
+                <a class="download-now download-direct" href="${data.videoUrl}" download="tiktok-video-${new Date().getTime()}.mp4">
+                  <i class="fas fa-arrow-down"></i>
+                  <span>Download Langsung</span>
+                </a>
               </div>
             </div>
           `;
@@ -395,14 +435,63 @@
       }
     }
     
-    function saveVideo(url) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'tiktok-video-' + new Date().getTime() + '.mp4';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    function saveVideo(url, method) {
+      if (method === 'metode1') {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tiktok-video-' + new Date().getTime() + '.mp4';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+        }, 100);
+      } else if (method === 'metode2') {
+        fetch(url)
+          .then(response => response.blob())
+          .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = blobUrl;
+            a.download = 'tiktok-video-paksa-' + new Date().getTime() + '.mp4';
+            document.body.appendChild(a);
+            a.click();
+            
+            window.URL.revokeObjectURL(blobUrl);
+            setTimeout(() => {
+              document.body.removeChild(a);
+            }, 100);
+          })
+          .catch(error => {
+            console.error('Error saat mengunduh video:', error);
+            showAlert('Gagal mengunduh video. Coba gunakan metode download lainnya.', 'error');
+          });
+      }
     }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const result = document.getElementById('result');
+      result.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'videoPreview') {
+          const video = e.target;
+          if (!video.onended) {
+            video.onended = function() {
+              if (confirm('Video selesai diputar. Ingin mendownload sekarang?')) {
+                const videoUrl = video.src;
+                saveVideo(videoUrl, 'metode2');
+              }
+            };
+          }
+        }
+      });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const a = document.createElement('a');
+      if (typeof a.download === 'undefined') {
+        showAlert('Browser Anda mungkin tidak mendukung pengunduhan langsung. Silakan gunakan browser lain seperti Chrome atau Firefox.', 'warning');
+      }
+    });
   </script>
 </body>
 </html>
